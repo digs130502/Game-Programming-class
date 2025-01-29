@@ -36,6 +36,8 @@ func main() {
 	var playerChoice string
 	var randomNum int
 	var NPCchoice string
+	var roundNumber int = 1
+	var count int = 0
 
 	//Introductory message
 	fmt.Println("Welcome to Rock Paper Scissors! Make your first choice! >:)")
@@ -44,6 +46,17 @@ func main() {
 
 	//Set up loop to exit only on player typing exit or Exit
 	for !playerExit {
+
+		//New round indicator
+		fmt.Println("Round:", roundNumber)
+
+		//Set up "twist" if count is greater than or equal to 3 then "super move" is initiated and you skip a round
+		if count >= 3 {
+			fmt.Println("You've won 3 times in a row! Super move has been initiated! You skip a round.")
+			roundNumber += 1
+			count = 0
+			continue
+		}
 
 		//Set up random number for npc choices
 		randomNum = rand.Intn(3)
@@ -71,6 +84,7 @@ func main() {
 		if playerChoice == NPCchoice {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("Tie! Next Round! >:)")
+			roundNumber += 1
 			continue
 		} else if (playerChoice == "rock" || playerChoice == "Rock") && NPCchoice == "paper" {
 			fmt.Println("Computer's choice:", NPCchoice)
@@ -79,6 +93,8 @@ func main() {
 		} else if (playerChoice == "rock" || playerChoice == "Rock") && NPCchoice == "scissors" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
+			roundNumber += 1
+			count += 1
 			continue
 		} else if (playerChoice == "paper" || playerChoice == "Paper") && NPCchoice == "scissors" {
 			fmt.Println("Computer's choice:", NPCchoice)
@@ -87,6 +103,8 @@ func main() {
 		} else if (playerChoice == "paper" || playerChoice == "Paper") && NPCchoice == "rock" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
+			roundNumber += 1
+			count += 1
 			continue
 		} else if (playerChoice == "scissors" || playerChoice == "Scissors") && NPCchoice == "rock" {
 			fmt.Println("Computer's choice:", NPCchoice)
@@ -95,6 +113,8 @@ func main() {
 		} else if (playerChoice == "scissors" || playerChoice == "Scissors") && NPCchoice == "paper" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
+			roundNumber += 1
+			count += 1
 			continue
 		}
 
