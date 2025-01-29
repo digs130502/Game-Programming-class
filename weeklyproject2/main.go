@@ -51,6 +51,11 @@ func main() {
 		//New round indicator
 		fmt.Println("Round:", roundNumber)
 
+		//Print if there is a win streak
+		if count >= 1 {
+			fmt.Println("Win streak:", count)
+		}
+
 		//Set up "twist" if count is greater than or equal to 3 then "super move" is initiated and you skip a round
 		if count >= 3 {
 			fmt.Println("You've won 3 times in a row! Super move has been initiated! You skip a round.")
@@ -94,9 +99,11 @@ func main() {
 		if playerChoice == NPCchoice {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("Tie! Next Round! >:)")
+			count = 0
 		} else if playerChoice == "rock" && NPCchoice == "paper" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You lost! Better luck next round!")
+			count = 0
 		} else if playerChoice == "rock" && NPCchoice == "scissors" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
@@ -104,6 +111,7 @@ func main() {
 		} else if playerChoice == "paper" && NPCchoice == "scissors" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You lost! Better luck next round!")
+			count = 0
 		} else if playerChoice == "paper" && NPCchoice == "rock" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
@@ -111,6 +119,7 @@ func main() {
 		} else if playerChoice == "scissors" && NPCchoice == "rock" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You lost! Better luck next round!")
+			count = 0
 		} else if playerChoice == "scissors" && NPCchoice == "paper" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
