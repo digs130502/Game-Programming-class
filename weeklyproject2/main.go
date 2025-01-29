@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -53,7 +54,7 @@ func main() {
 		//Set up "twist" if count is greater than or equal to 3 then "super move" is initiated and you skip a round
 		if count >= 3 {
 			fmt.Println("You've won 3 times in a row! Super move has been initiated! You skip a round.")
-			roundNumber += 1
+			roundNumber++
 			count = 0
 			continue
 		}
@@ -74,8 +75,17 @@ func main() {
 		fmt.Print("Your choice: ")
 		fmt.Scanln(&playerChoice)
 
+		//Convert input to lowercase
+		playerChoice = strings.ToLower(playerChoice)
+
+		//Handle exit input
+		if playerChoice == "exit" {
+			println("Quit the game! Thanks for playing!")
+			break
+		}
+
 		//Conditional in case of wrong answer or type
-		if playerChoice != "rock" && playerChoice != "Rock" && playerChoice != "paper" && playerChoice != "Paper" && playerChoice != "scissors" && playerChoice != "Scissors" {
+		if playerChoice != "rock" && playerChoice != "paper" && playerChoice != "scissors" {
 			fmt.Println("Oops! Not an actual answer in the game. Please answer again!")
 			continue
 		}
@@ -84,43 +94,30 @@ func main() {
 		if playerChoice == NPCchoice {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("Tie! Next Round! >:)")
-			roundNumber += 1
-			continue
-		} else if (playerChoice == "rock" || playerChoice == "Rock") && NPCchoice == "paper" {
+		} else if playerChoice == "rock" && NPCchoice == "paper" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You lost! Better luck next round!")
-			break
-		} else if (playerChoice == "rock" || playerChoice == "Rock") && NPCchoice == "scissors" {
+		} else if playerChoice == "rock" && NPCchoice == "scissors" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
-			roundNumber += 1
 			count += 1
-			continue
-		} else if (playerChoice == "paper" || playerChoice == "Paper") && NPCchoice == "scissors" {
+		} else if playerChoice == "paper" && NPCchoice == "scissors" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You lost! Better luck next round!")
-			break
-		} else if (playerChoice == "paper" || playerChoice == "Paper") && NPCchoice == "rock" {
+		} else if playerChoice == "paper" && NPCchoice == "rock" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
-			roundNumber += 1
 			count += 1
-			continue
-		} else if (playerChoice == "scissors" || playerChoice == "Scissors") && NPCchoice == "rock" {
+		} else if playerChoice == "scissors" && NPCchoice == "rock" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You lost! Better luck next round!")
-			break
-		} else if (playerChoice == "scissors" || playerChoice == "Scissors") && NPCchoice == "paper" {
+		} else if playerChoice == "scissors" && NPCchoice == "paper" {
 			fmt.Println("Computer's choice:", NPCchoice)
 			fmt.Println("You win! Continue to next round!")
-			roundNumber += 1
 			count += 1
-			continue
 		}
 
-		if playerChoice == "Exit" || playerChoice == "exit" {
-			playerExit = true
-		}
+		roundNumber++
 	}
 
 }
