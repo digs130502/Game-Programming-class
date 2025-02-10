@@ -19,7 +19,21 @@ type CardDeck struct {
 // NewDeck initializes a new deck of cards in standard order
 func NewDeck() *CardDeck {
 
-	return &CardDeck{}
+	var cards []Card
+
+	for i := 0; i < len(suits); i++ {
+		for j := 0; j < len(values); j++ {
+
+			card := Card{
+				Suit:  suits[i],
+				Value: values[j],
+			}
+
+			cards = append(cards, card)
+		}
+	}
+
+	return &CardDeck{Cards: cards}
 }
 
 // Shuffle randomizes the order of the cards in the deck
