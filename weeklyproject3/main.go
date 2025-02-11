@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	MyTests() //run your custom test code
+	//MyTests() //run your custom test code
 
 	points := 0
 
