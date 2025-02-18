@@ -23,7 +23,6 @@ func main() {
 	var gap float32 = 80
 	var points int = 0
 	var gotPoint bool = false
-
 	var pipeHeight float32 = float32(rand.Intn(250) + 50)
 
 	//DONE: Player Movement. Pipe spawning, Gap in between the pipes, score system.
@@ -48,8 +47,26 @@ func main() {
 			playerY += playerSpeed * rl.GetFrameTime()
 		}
 
-		if rl.IsKeyDown(rl.KeyR) {
-			break
+		//Collision mechanic
+		player := rl.Rectangle{X: 100, Y: playerY, Width: 50, Height: 50}
+		topPipe := rl.Rectangle{X: pipeX, Y: 0, Width: 70, Height: pipeHeight}
+		bottomPipe := rl.Rectangle{X: pipeX, Y: pipeHeight + gap, Width: 70, Height: 450 - (pipeHeight + gap)}
+
+		if rl.CheckCollisionRecs(player, topPipe) || rl.CheckCollisionRecs(player, bottomPipe) {
+			playerSpeed = 0
+			pipeSpeed = 0
+			rl.DrawText("Game Over!", 340, 150, 20, rl.Black)
+			rl.DrawText("Press R to restart the game", 250, 180, 20, rl.Black)
+			rl.DrawText("Press Q to quit the game", 270, 210, 20, rl.Black)
+
+			if rl.IsKeyDown(rl.KeyR) {
+				pipeX = 750
+				pipeSpeed = 150
+				playerSpeed = 100
+				playerY = 200
+				points = 0
+			}
+
 		}
 
 		//Pipe respawing
@@ -66,6 +83,11 @@ func main() {
 		}
 		pointsText := fmt.Sprintf("Points: %d", points)
 		rl.DrawText(pointsText, 5, 5, 20, rl.Black)
+
+		//Quit game system
+		if rl.IsKeyDown(rl.KeyQ) {
+			break
+		}
 
 		rl.EndDrawing()
 	}
