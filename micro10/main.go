@@ -8,6 +8,46 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type PhysicsBody struct {
+	Pos     rl.Vector2
+	Vel     rl.Vector2
+	Gravity rl.Vector2
+}
+
+func NewPhysicsBody() PhysicsBody {
+	pb := PhysicsBody{Pos: rl.NewVector2(100, 200), Vel: rl.NewVector2(0, 0), Gravity: rl.NewVector2(0, 500)}
+	return pb
+}
+
+type Player struct {
+	PhysicsBody //embedding in player
+}
+
+func NewPlayer() Player {
+	np := Player{}
+	np.PhysicsBody = NewPhysicsBody()
+	return np
+}
+
+func (pb *PhysicsBody) VelocityTick() {
+	adjustedVel := rl.Vector2Scale(pb.Vel, rl.GetFrameTime()) //scales the velocity to frame time ok ok
+	pb.Pos = rl.Vector2Add(pb.Pos, adjustedVel)               //Adds velocity to position effectively changing the position
+}
+
+func (pb *PhysicsBody) GravityTick() {
+	adjustedGravity := rl.Vector2Scale(pb.Gravity, rl.GetFrameTime())
+	pb.Vel = rl.Vector2Add(pb.Vel, adjustedGravity)
+}
+
+func (p *Player) PhysicsUpdate() {
+	p.GravityTick()
+	p.VelocityTick()
+}
+
+func (p Player) DrawPlayer() {
+	rl.DrawRectangle(int32(p.Pos.X), int32(p.Pos.Y), 50, 50, rl.Orange)
+}
+
 func main() {
 	rl.InitWindow(800, 450, "Flappy Bird")
 	defer rl.CloseWindow()
@@ -16,14 +56,16 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	var playerY float32 = 200
-	var playerSpeed float32 = 100
+	//var playerY float32 = 200
+	//var playerSpeed float32 = 100
 	var pipeX float32 = 750
 	var pipeSpeed float32 = 150
-	var gap float32 = 80
+	var gap float32 = 130
 	var points int = 0
 	var gotPoint bool = false
 	var pipeHeight float32 = float32(rand.Intn(250) + 50)
+
+	player := NewPlayer()
 
 	//DONE: Player Movement. Pipe spawning, Gap in between the pipes, score system.
 	//To DO: Hitting pipe. Pressing "R" to restart the game
@@ -32,41 +74,42 @@ func main() {
 		rl.BeginDrawing()
 
 		rl.ClearBackground(rl.RayWhite)
-		rl.DrawRectangle(100, int32(playerY), 50, 50, rl.Orange)
 		rl.DrawRectangle(int32(pipeX), 0, 70, int32(pipeHeight), rl.Green)
 		rl.DrawRectangle(int32(pipeX), int32(pipeHeight+gap), 70, 450-int32(pipeHeight+gap), rl.Green)
 
 		//Pipe movement
 		pipeX -= pipeSpeed * rl.GetFrameTime()
+		player.PhysicsUpdate()
+		player.DrawPlayer()
 
 		//Player movement
-		if rl.IsKeyDown(rl.KeyW) && playerY > 0 {
-			playerY -= playerSpeed * rl.GetFrameTime()
-		}
-		if rl.IsKeyDown(rl.KeyS) && playerY+50 < 450 {
-			playerY += playerSpeed * rl.GetFrameTime()
+		if rl.IsKeyPressed(rl.KeySpace) {
+			player.Vel = rl.NewVector2(0, -250)
 		}
 
-		//Collision mechanic
-		player := rl.Rectangle{X: 100, Y: playerY, Width: 50, Height: 50}
+		// Collision mechanic
+		playerRect := rl.Rectangle{X: float32(player.Pos.X), Y: float32(player.Pos.Y), Width: 50, Height: 50}
 		topPipe := rl.Rectangle{X: pipeX, Y: 0, Width: 70, Height: pipeHeight}
 		bottomPipe := rl.Rectangle{X: pipeX, Y: pipeHeight + gap, Width: 70, Height: 450 - (pipeHeight + gap)}
 
-		if rl.CheckCollisionRecs(player, topPipe) || rl.CheckCollisionRecs(player, bottomPipe) {
-			playerSpeed = 0
+		if rl.CheckCollisionRecs(playerRect, topPipe) || rl.CheckCollisionRecs(playerRect, bottomPipe) {
 			pipeSpeed = 0
+			player.Vel = rl.NewVector2(0, 0) // Stop player movement
+			player.Gravity = rl.NewVector2(0, 0)
+
 			rl.DrawText("Game Over!", 340, 150, 20, rl.Black)
 			rl.DrawText("Press R to restart the game", 250, 180, 20, rl.Black)
 			rl.DrawText("Press Q to quit the game", 270, 210, 20, rl.Black)
 
 			if rl.IsKeyDown(rl.KeyR) {
+				// Reset game state
 				pipeX = 750
 				pipeSpeed = 150
-				playerSpeed = 100
-				playerY = 200
+				player.Pos = rl.NewVector2(100, 200)
+				player.Vel = rl.NewVector2(0, 0)
+				player.Gravity = rl.NewVector2(0, 500)
 				points = 0
 			}
-
 		}
 
 		//Pipe respawing
