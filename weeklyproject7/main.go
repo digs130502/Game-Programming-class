@@ -8,18 +8,31 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
+	//Initialize player
 	player := NewPlayer()
 
+	//Initialize audio
+	rl.InitAudioDevice()
+	spaceMusic := rl.LoadMusicStream("assets/audio/space.mp3") //Load music Space
+	rl.SetMusicVolume(spaceMusic, .05)                         //Set Volume
+	rl.PlayMusicStream(spaceMusic)
+
 	for !rl.WindowShouldClose() {
+		rl.UpdateMusicStream(spaceMusic)
+
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		//Rendering
-		player.DrawPlayer()
+		// Rendering
 		rl.DrawCircle(400, 225, 35, rl.Brown)
+		player.DrawPlayer()
 
-		//Movement
+		// Movement
 		player.MovePlayer()
+
 		rl.EndDrawing()
 	}
+
+	rl.UnloadMusicStream(spaceMusic)
+
 }
