@@ -51,17 +51,22 @@ func main() {
 			player.UpdateProjectiles()
 			zone.UpdateAsteroids()
 			zone.CheckAsteroidCollision(&planet, &player)
+			player.CheckPlanetCollision(&planet)
+			gameRunning = planet.CheckGameOver()
 
 			// Rendering
 			planet.DrawPlanet()
 			player.DrawPlayer()
 			player.DrawProjectiles()
 			zone.DrawAsteroid()
-			gameRunning = planet.CheckGameOver()
 
 			//Planet health
 			planetText := fmt.Sprintf("Planet Health: %d", planet.Health)
 			rl.DrawText(planetText, 10, 10, 18, rl.White)
+
+			//Player cargo
+			cargoText := fmt.Sprintf("Player Cargo: %d", player.Cargo)
+			rl.DrawText(cargoText, 10, 30, 18, rl.RayWhite)
 
 		} else {
 			rl.ClearBackground(rl.Red)

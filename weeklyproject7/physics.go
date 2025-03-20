@@ -11,6 +11,7 @@ type Player struct {
 	Y           float32
 	Angle       float32
 	Scale       float32
+	Cargo       int32
 	Texture     rl.Texture2D
 	Projectiles []Projectile
 }
@@ -33,7 +34,7 @@ type Planet struct {
 // Constructors
 func NewPlayer() Player {
 	sprite := rl.LoadTexture("assets/textures/spaceship.png")
-	return Player{X: 300, Y: 200, Angle: 0, Scale: 2, Texture: sprite, Projectiles: []Projectile{}}
+	return Player{X: 300, Y: 200, Angle: 0, Scale: 2, Cargo: 0, Texture: sprite, Projectiles: []Projectile{}}
 }
 
 func NewPlanet() Planet {
@@ -80,6 +81,32 @@ func (p *Player) UpdateProjectiles() {
 
 func (p *Planet) CheckGameOver() bool {
 	return p.Health > 0
+}
+
+func (p *Player) CheckPlanetCollision(pl *Planet) {
+	heal := rl.LoadSound("assets/audio/heal.wav")
+
+	if pl.Health >= 10 {
+		return
+	}
+
+	if p.Cargo <= 0 {
+		return
+	}
+
+	distanceX := p.X - pl.X
+	distanceY := p.Y - pl.Y
+	distance := float32(math.Sqrt(float64(distanceX*distanceX + distanceY*distanceY)))
+	playerRadius := (float32(p.Texture.Width) / 2) * p.Scale
+
+	if distance <= (playerRadius + pl.Radius) {
+		rl.PlaySound(heal)
+		p.Cargo -= 1
+		pl.Health += 1
+		if pl.Health >= 10 {
+			p.Cargo = 0
+		}
+	}
 }
 
 // Player Movement

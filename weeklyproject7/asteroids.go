@@ -38,8 +38,8 @@ func (z *Zone) NewAsteroid() {
 
 	// Normalize direction vector (ensures uniform speed)
 	length := float32(math.Sqrt(float64(dirX*dirX + dirY*dirY)))
-	velocityX := (dirX / length) * 2
-	velocityY := (dirY / length) * 2
+	velocityX := (dirX / length) * 0.75
+	velocityY := (dirY / length) * 0.75
 
 	asteroid := Asteroid{
 		X:         startX,
@@ -69,6 +69,8 @@ func (z *Zone) UpdateAsteroids() {
 // TODO: Check and understand this
 // - Add mini asteroid after collision
 func (z *Zone) CheckAsteroidCollision(p *Planet, pl *Player) {
+	//Load sound
+	explosion := rl.LoadSound("assets/audio/explosion.wav")
 	// Temporary slice to hold asteroids that should remain
 	var newAsteroids []Asteroid
 
@@ -98,7 +100,8 @@ func (z *Zone) CheckAsteroidCollision(p *Planet, pl *Player) {
 
 			if distProj <= (asteroid.Radius + proj.Radius) {
 				projectileDestroyed = true // Mark asteroid for removal
-				continue                   // Skip adding this projectile (it gets removed)
+				rl.PlaySound(explosion)
+				continue // Skip adding this projectile (it gets removed)
 			}
 
 			// Keep this projectile if it didn't collide
