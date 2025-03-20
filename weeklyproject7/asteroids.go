@@ -66,15 +66,54 @@ func (z *Zone) UpdateAsteroids() {
 	}
 }
 
-func (z *Zone) CheckAsteroidCollision(p *Planet) {
-	for i := range z.Asteroids {
-		distanceX := z.Asteroids[i].X - p.X
-		distanceY := z.Asteroids[i].Y - p.Y
+// TODO: Check and understand this
+// - Add mini asteroid after collision
+func (z *Zone) CheckAsteroidCollision(p *Planet, pl *Player) {
+	// Temporary slice to hold asteroids that should remain
+	var newAsteroids []Asteroid
+
+	// Loop through asteroids (forward this time, since we won't modify `z.Asteroids` in-place)
+	for _, asteroid := range z.Asteroids {
+		planetCollision := false
+		projectileDestroyed := false
+
+		// Check collision with the planet
+		distanceX := asteroid.X - p.X
+		distanceY := asteroid.Y - p.Y
 		distance := float32(math.Sqrt(float64(distanceX*distanceX + distanceY*distanceY)))
 
-		if distance <= (z.Asteroids[i].Radius + p.Radius) {
-			z.Asteroids = append(z.Asteroids[:i], z.Asteroids[i+1:]...)
-			p.Health -= 1
+		if distance <= (asteroid.Radius + p.Radius) {
+			p.Health -= 1          // Damage planet
+			planetCollision = true // Mark asteroid for removal
+		}
+
+		// Temporary slice for remaining projectiles
+		var newProjectiles []Projectile
+
+		// Check collision with projectiles
+		for _, proj := range pl.Projectiles {
+			distProjX := asteroid.X - proj.X
+			distProjY := asteroid.Y - proj.Y
+			distProj := float32(math.Sqrt(float64(distProjX*distProjX + distProjY*distProjY)))
+
+			if distProj <= (asteroid.Radius + proj.Radius) {
+				projectileDestroyed = true // Mark asteroid for removal
+				continue                   // Skip adding this projectile (it gets removed)
+			}
+
+			// Keep this projectile if it didn't collide
+			newProjectiles = append(newProjectiles, proj)
+		}
+
+		// Assign updated projectile list
+		pl.Projectiles = newProjectiles
+
+		// Keep the asteroid only if it did NOT collide with planet or projectile
+		if !planetCollision && !projectileDestroyed {
+			newAsteroids = append(newAsteroids, asteroid)
 		}
 	}
+
+	// Assign updated asteroid list
+	z.Asteroids = newAsteroids
 }

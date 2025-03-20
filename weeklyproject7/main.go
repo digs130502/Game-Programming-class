@@ -16,46 +16,66 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	//Initialize player
+	// Initialize player
 	player := NewPlayer()
 
 	//Initialize planet
 	planet := NewPlanet()
 
-	//Initialize zone
+	// Initialize zone
 	zone := NewZone()
 
-	//Initialize audio
+	// Initialize audio
 	rl.InitAudioDevice()
 	spaceMusic := rl.LoadMusicStream("assets/audio/space.mp3") //Load music Space
 	rl.SetMusicVolume(spaceMusic, .05)                         //Set Volume
 	rl.PlayMusicStream(spaceMusic)
 
-	//Initialize Asteroids
+	// Initialize Asteroids
+	// Might need to finish this later
 	zone.NewAsteroid()
 	zone.NewAsteroid()
+
+	// Initialize Game
+	gameRunning := planet.CheckGameOver()
 
 	for !rl.WindowShouldClose() {
 		rl.UpdateMusicStream(spaceMusic)
 
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.Black)
+		if gameRunning {
+			rl.ClearBackground(rl.Black)
 
-		// Updates
-		player.MovePlayer()
-		player.UpdateProjectiles()
-		zone.UpdateAsteroids()
-		zone.CheckAsteroidCollision(&planet)
+			// Updates
+			player.MovePlayer()
+			player.UpdateProjectiles()
+			zone.UpdateAsteroids()
+			zone.CheckAsteroidCollision(&planet, &player)
 
-		// Rendering
-		planet.DrawPlanet()
-		player.DrawPlayer()
-		player.DrawProjectiles()
-		zone.DrawAsteroid()
+			// Rendering
+			planet.DrawPlanet()
+			player.DrawPlayer()
+			player.DrawProjectiles()
+			zone.DrawAsteroid()
+			gameRunning = planet.CheckGameOver()
 
-		//Planet health
-		planetText := fmt.Sprintf("Planet Health: %d", planet.Health)
-		rl.DrawText(planetText, 10, 10, 18, rl.White)
+			//Planet health
+			planetText := fmt.Sprintf("Planet Health: %d", planet.Health)
+			rl.DrawText(planetText, 10, 10, 18, rl.White)
+
+		} else {
+			rl.ClearBackground(rl.Red)
+			rl.DrawText("Game Over! Press R to restart.", 400, 225, 20, rl.RayWhite)
+			zone.Asteroids = []Asteroid{}
+			if rl.IsKeyPressed(rl.KeyR) {
+				gameRunning = true
+				planet.Health = 10
+
+				// Might need to fix this later
+				zone.NewAsteroid()
+				zone.NewAsteroid()
+			}
+		}
 
 		rl.EndDrawing()
 	}

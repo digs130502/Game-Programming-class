@@ -78,6 +78,10 @@ func (p *Player) UpdateProjectiles() {
 	}
 }
 
+func (p *Planet) CheckGameOver() bool {
+	return p.Health > 0
+}
+
 // Player Movement
 func (p *Player) MovePlayer() {
 	if rl.IsKeyDown(rl.KeyA) {
@@ -95,10 +99,10 @@ func (p *Player) MovePlayer() {
 
 	//Rotation
 	if rl.IsKeyDown(rl.KeyQ) {
-		p.Angle -= 100 * rl.GetFrameTime()
+		p.Angle -= 200 * rl.GetFrameTime()
 	}
 	if rl.IsKeyDown(rl.KeyR) {
-		p.Angle += 100 * rl.GetFrameTime()
+		p.Angle += 200 * rl.GetFrameTime()
 	}
 
 	//Shooting
