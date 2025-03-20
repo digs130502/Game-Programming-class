@@ -45,6 +45,7 @@ func main() {
 		player.MovePlayer()
 		player.UpdateProjectiles()
 		zone.UpdateAsteroids()
+		zone.CheckAsteroidCollision(&planet)
 
 		// Rendering
 		planet.DrawPlanet()

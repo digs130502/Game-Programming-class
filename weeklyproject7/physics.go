@@ -97,7 +97,7 @@ func (p *Player) MovePlayer() {
 	if rl.IsKeyDown(rl.KeyQ) {
 		p.Angle -= 100 * rl.GetFrameTime()
 	}
-	if rl.IsKeyDown(rl.KeyE) {
+	if rl.IsKeyDown(rl.KeyR) {
 		p.Angle += 100 * rl.GetFrameTime()
 	}
 
