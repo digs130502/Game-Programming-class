@@ -1,6 +1,10 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"fmt"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 func main() {
 	rl.InitWindow(800, 450, "Space Defense")
@@ -10,6 +14,9 @@ func main() {
 
 	//Initialize player
 	player := NewPlayer()
+
+	//Initialize planet
+	planet := NewPlanet()
 
 	//Initialize audio
 	rl.InitAudioDevice()
@@ -23,12 +30,18 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		// Rendering
-		rl.DrawCircle(400, 225, 35, rl.Brown)
-		player.DrawPlayer()
-
-		// Movement
+		// Updates
 		player.MovePlayer()
+		player.UpdateProjectiles()
+
+		// Rendering
+		planet.DrawPlanet()
+		player.DrawPlayer()
+		player.DrawProjectiles()
+
+		//Planet health
+		planetText := fmt.Sprintf("Planet Health: %d", planet.Health)
+		rl.DrawText(planetText, 10, 10, 18, rl.White)
 
 		rl.EndDrawing()
 	}
