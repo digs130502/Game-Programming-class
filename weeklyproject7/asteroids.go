@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -106,96 +107,59 @@ func (z *Zone) UpdateCargoAsteroids() {
 	}
 }
 
-func (z *Zone) SpawnSmallerAsteroids(ast Asteroid) {
-	newRadius := 10
-
-	for i := 0; i < 2; i++ {
-
-		angle := rand.Float32() * 2 * rl.Pi
-		velocityX := float32(math.Cos(float64(angle))) * 1
-		velocityY := float32(math.Sin(float64(angle))) * 1
-
-		smallAsteroid := Asteroid{
-			X:         ast.X,
-			Y:         ast.Y,
-			VelocityX: velocityX,
-			VelocityY: velocityY,
-			Radius:    float32(newRadius),
-			Color:     ast.Color,
-		}
-
-		z.Asteroids = append(z.Asteroids, smallAsteroid)
-	}
-}
-
-/*
-// TODO: Check and understand this
-// - Add mini asteroid after collision
-func (z *Zone) CheckAsteroidCollision(p *Planet, pl *Player) {
-	// Load sound
-	explosion := rl.LoadSound("assets/audio/explosion.wav")
-
-	// Temporary slice for remaining asteroids
+func (z *Zone) CheckAsteroidCollision(pl *Player, explosion rl.Sound) {
 	var newAsteroids []Asteroid
-	// Temporary slice for remaining projectiles
-	var newProjectiles []Projectile
+	var spawnedAsteroids []Asteroid
 
-	// Loop through asteroids
 	for _, asteroid := range z.Asteroids {
-		planetCollision := false
-		projectileDestroyed := false
+		asteroidDestroyed := false
 
-		// Check collision with planet
-		distanceX := asteroid.X - p.X
-		distanceY := asteroid.Y - p.Y
-		distance := float32(math.Sqrt(float64(distanceX*distanceX + distanceY*distanceY)))
+		for i, proj := range pl.Projectiles {
+			dx := asteroid.X - proj.X
+			dy := asteroid.Y - proj.Y
+			distance := float32(math.Sqrt(float64(dx*dx + dy*dy)))
 
-		if distance <= (asteroid.Radius + p.Radius) {
-			p.Health -= 1
-			planetCollision = true
-		}
-
-		for _, proj := range pl.Projectiles {
-			distProjX := asteroid.X - proj.X
-			distProjY := asteroid.Y - proj.Y
-			distProj := float32(math.Sqrt(float64(distProjX*distProjX + distProjY*distProjY)))
-
-			if distProj <= (asteroid.Radius + proj.Radius) {
-				projectileDestroyed = true
+			if distance <= (asteroid.Radius + proj.Radius) {
 				rl.PlaySound(explosion)
+				asteroidDestroyed = true
+				fmt.Println("destroying:", asteroid)
 
 				if asteroid.Radius > 10 {
-					z.SpawnSmallerAsteroids(asteroid)
+					for i := 0; i < 2; i++ {
+						angle := rand.Float64() * 2 * math.Pi
+						velocityX := float32(math.Cos(angle)) * 1
+						velocityY := float32(math.Sin(angle)) * 1
+
+						smallAsteroid := Asteroid{
+							X:         asteroid.X,
+							Y:         asteroid.Y,
+							VelocityX: velocityX,
+							VelocityY: velocityY,
+							Radius:    10.0,
+							Color:     asteroid.Color,
+						}
+						spawnedAsteroids = append(spawnedAsteroids, smallAsteroid)
+					}
 				} else {
 					z.NewCargoAsteroid(asteroid)
 					z.NewCargoAsteroid(asteroid)
 				}
 
-				// Skip adding this projectile, but BREAK here so we don't continue looping
-				continue
+				pl.Projectiles = append(pl.Projectiles[:i], pl.Projectiles[i+1:]...)
+				break
 			}
-
-			newProjectiles = append(newProjectiles, proj)
 		}
 
-		// Keep asteroid if it didn't collide
-		if !planetCollision && !projectileDestroyed {
+		if !asteroidDestroyed {
 			newAsteroids = append(newAsteroids, asteroid)
 		}
 	}
 
-	// Update asteroids and projectiles lists
-	z.Asteroids = newAsteroids
-	pl.Projectiles = newProjectiles // ✅ Now properly removes hit projectiles
-}*/
-
-func (z *Zone) CheckAsteroidCollision() {
-
+	z.Asteroids = append(newAsteroids, spawnedAsteroids...)
 }
 
-func (z *Zone) CheckCargoAsteroidCollision(pl *Player) {
-	//Load sound
-	bounce := rl.LoadSound("assets/audio/bounce.wav")
+// TODO: Make the collision better. Player hitbox is too big
+func (z *Zone) CheckCargoAsteroidCollision(pl *Player, bounce rl.Sound) {
 
 	var newCargoAsteroids []CargoAsteroid
 

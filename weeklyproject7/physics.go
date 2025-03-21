@@ -83,8 +83,7 @@ func (p *Planet) CheckGameOver() bool {
 	return p.Health > 0
 }
 
-func (p *Player) CheckPlanetCollision(pl *Planet) {
-	heal := rl.LoadSound("assets/audio/heal.wav")
+func (p *Player) CheckPlanetCollision(pl *Planet, heal rl.Sound) {
 
 	if pl.Health >= 10 {
 		return
@@ -110,7 +109,7 @@ func (p *Player) CheckPlanetCollision(pl *Planet) {
 }
 
 // Player Movement
-func (p *Player) MovePlayer() {
+func (p *Player) MovePlayer(shootSound rl.Sound) {
 	if rl.IsKeyDown(rl.KeyA) {
 		p.X -= 100 * rl.GetFrameTime()
 	}
@@ -135,7 +134,6 @@ func (p *Player) MovePlayer() {
 	//Shooting
 	if rl.IsKeyPressed(rl.KeySpace) {
 		p.Shoot()
-		shootSound := rl.LoadSound("assets/audio/shoot.wav")
 		rl.PlaySound(shootSound)
 	}
 }

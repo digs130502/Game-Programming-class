@@ -30,11 +30,14 @@ func main() {
 	spaceMusic := rl.LoadMusicStream("assets/audio/space.mp3") //Load music Space
 	rl.SetMusicVolume(spaceMusic, .05)                         //Set Volume
 	rl.PlayMusicStream(spaceMusic)
+	explosion := rl.LoadSound("assets/audio/explosion.wav")
+	bounce := rl.LoadSound("assets/audio/bounce.wav")
+	heal := rl.LoadSound("assets/audio/heal.wav")
+	shootSound := rl.LoadSound("assets/audio/shoot.wav")
 
-	// Initialize Asteroids
-	// Might need to finish this later
-	zone.NewAsteroid(20)
-	zone.NewAsteroid(20)
+	// Timer
+	spawnTimer := 0
+	spawnInterval := 180
 
 	// Initialize Game
 	gameRunning := planet.CheckGameOver()
@@ -47,14 +50,21 @@ func main() {
 			rl.ClearBackground(rl.Black)
 
 			// Updates
-			player.MovePlayer()
+			player.MovePlayer(shootSound)
 			player.UpdateProjectiles()
-			player.CheckPlanetCollision(&planet)
+			player.CheckPlanetCollision(&planet, heal)
 			zone.UpdateAsteroids()
 			zone.UpdateCargoAsteroids()
-			//zone.CheckAsteroidCollision(&planet, &player)
-			zone.CheckCargoAsteroidCollision(&player)
+			zone.CheckAsteroidCollision(&player, explosion)
+			zone.CheckCargoAsteroidCollision(&player, bounce)
 			gameRunning = planet.CheckGameOver()
+
+			//Update timer
+			spawnTimer++
+			if spawnTimer >= spawnInterval {
+				zone.NewAsteroid(20)
+				spawnTimer = 0
+			}
 
 			// Rendering
 			planet.DrawPlanet()
@@ -78,10 +88,7 @@ func main() {
 			if rl.IsKeyPressed(rl.KeyR) {
 				gameRunning = true
 				planet.Health = 10
-
-				// Might need to fix this later
-				zone.NewAsteroid(20)
-				zone.NewAsteroid(20)
+				spawnTimer = 0
 			}
 		}
 
