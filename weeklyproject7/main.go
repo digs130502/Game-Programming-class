@@ -33,8 +33,8 @@ func main() {
 
 	// Initialize Asteroids
 	// Might need to finish this later
-	zone.NewAsteroid()
-	zone.NewAsteroid()
+	zone.NewAsteroid(20)
+	zone.NewAsteroid(20)
 
 	// Initialize Game
 	gameRunning := planet.CheckGameOver()
@@ -49,9 +49,11 @@ func main() {
 			// Updates
 			player.MovePlayer()
 			player.UpdateProjectiles()
-			zone.UpdateAsteroids()
-			zone.CheckAsteroidCollision(&planet, &player)
 			player.CheckPlanetCollision(&planet)
+			zone.UpdateAsteroids()
+			zone.UpdateCargoAsteroids()
+			//zone.CheckAsteroidCollision(&planet, &player)
+			zone.CheckCargoAsteroidCollision(&player)
 			gameRunning = planet.CheckGameOver()
 
 			// Rendering
@@ -59,6 +61,7 @@ func main() {
 			player.DrawPlayer()
 			player.DrawProjectiles()
 			zone.DrawAsteroid()
+			zone.DrawCargoAsteroid()
 
 			//Planet health
 			planetText := fmt.Sprintf("Planet Health: %d", planet.Health)
@@ -77,8 +80,8 @@ func main() {
 				planet.Health = 10
 
 				// Might need to fix this later
-				zone.NewAsteroid()
-				zone.NewAsteroid()
+				zone.NewAsteroid(20)
+				zone.NewAsteroid(20)
 			}
 		}
 
