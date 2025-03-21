@@ -38,14 +38,28 @@ func NewZone() Zone {
 }
 
 func (z *Zone) NewAsteroid(radius float32) {
+	var startX, startY float32
+	planetX := float32(400)
+	planetY := float32(225)
+	minDistance := float32(130)
 
-	startX := rand.Float32() * 800
-	startY := rand.Float32() * 450
+	for {
+		startX = rand.Float32() * 800
+		startY = rand.Float32() * 450
 
-	dirX := 400 - startX
-	dirY := 225 - startY
+		dx := planetX - startX
+		dy := planetY - startY
+		distance := float32(math.Sqrt(float64(dx*dx + dy*dy)))
 
+		if distance >= minDistance {
+			break
+		}
+	}
+
+	dirX := planetX - startX
+	dirY := planetY - startY
 	length := float32(math.Sqrt(float64(dirX*dirX + dirY*dirY)))
+
 	velocityX := (dirX / length) * 0.75
 	velocityY := (dirY / length) * 0.75
 
@@ -114,7 +128,6 @@ func (z *Zone) CheckAsteroidCollision(pl *Player, p *Planet, explosion rl.Sound)
 	for _, asteroid := range z.Asteroids {
 		asteroidDestroyed := false
 
-		// ✅ Check planet collision first
 		dxPlanet := asteroid.X - p.X
 		dyPlanet := asteroid.Y - p.Y
 		distanceToPlanet := float32(math.Sqrt(float64(dxPlanet*dxPlanet + dyPlanet*dyPlanet)))
@@ -125,7 +138,6 @@ func (z *Zone) CheckAsteroidCollision(pl *Player, p *Planet, explosion rl.Sound)
 			fmt.Println("asteroid hit planet:", asteroid)
 		}
 
-		// ✅ Only check projectile collision if not already destroyed by planet
 		if !asteroidDestroyed {
 			for i, proj := range pl.Projectiles {
 				dx := asteroid.X - proj.X
@@ -158,7 +170,6 @@ func (z *Zone) CheckAsteroidCollision(pl *Player, p *Planet, explosion rl.Sound)
 						z.NewCargoAsteroid(asteroid)
 					}
 
-					// Remove projectile that hit
 					pl.Projectiles = append(pl.Projectiles[:i], pl.Projectiles[i+1:]...)
 					break
 				}
