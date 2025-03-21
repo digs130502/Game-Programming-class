@@ -107,46 +107,61 @@ func (z *Zone) UpdateCargoAsteroids() {
 	}
 }
 
-func (z *Zone) CheckAsteroidCollision(pl *Player, explosion rl.Sound) {
+func (z *Zone) CheckAsteroidCollision(pl *Player, p *Planet, explosion rl.Sound) {
 	var newAsteroids []Asteroid
 	var spawnedAsteroids []Asteroid
 
 	for _, asteroid := range z.Asteroids {
 		asteroidDestroyed := false
 
-		for i, proj := range pl.Projectiles {
-			dx := asteroid.X - proj.X
-			dy := asteroid.Y - proj.Y
-			distance := float32(math.Sqrt(float64(dx*dx + dy*dy)))
+		// ✅ Check planet collision first
+		dxPlanet := asteroid.X - p.X
+		dyPlanet := asteroid.Y - p.Y
+		distanceToPlanet := float32(math.Sqrt(float64(dxPlanet*dxPlanet + dyPlanet*dyPlanet)))
 
-			if distance <= (asteroid.Radius + proj.Radius) {
-				rl.PlaySound(explosion)
-				asteroidDestroyed = true
-				fmt.Println("destroying:", asteroid)
+		if distanceToPlanet <= (asteroid.Radius + p.Radius) {
+			p.Health -= 1
+			asteroidDestroyed = true
+			fmt.Println("asteroid hit planet:", asteroid)
+		}
 
-				if asteroid.Radius > 10 {
-					for i := 0; i < 2; i++ {
-						angle := rand.Float64() * 2 * math.Pi
-						velocityX := float32(math.Cos(angle)) * 1
-						velocityY := float32(math.Sin(angle)) * 1
+		// ✅ Only check projectile collision if not already destroyed by planet
+		if !asteroidDestroyed {
+			for i, proj := range pl.Projectiles {
+				dx := asteroid.X - proj.X
+				dy := asteroid.Y - proj.Y
+				distance := float32(math.Sqrt(float64(dx*dx + dy*dy)))
 
-						smallAsteroid := Asteroid{
-							X:         asteroid.X,
-							Y:         asteroid.Y,
-							VelocityX: velocityX,
-							VelocityY: velocityY,
-							Radius:    10.0,
-							Color:     asteroid.Color,
+				if distance <= (asteroid.Radius + proj.Radius) {
+					rl.PlaySound(explosion)
+					asteroidDestroyed = true
+					fmt.Println("destroying with projectile:", asteroid)
+
+					if asteroid.Radius > 10 {
+						for i := 0; i < 2; i++ {
+							angle := rand.Float64() * 2 * math.Pi
+							velocityX := float32(math.Cos(angle)) * 1
+							velocityY := float32(math.Sin(angle)) * 1
+
+							smallAsteroid := Asteroid{
+								X:         asteroid.X,
+								Y:         asteroid.Y,
+								VelocityX: velocityX,
+								VelocityY: velocityY,
+								Radius:    10.0,
+								Color:     asteroid.Color,
+							}
+							spawnedAsteroids = append(spawnedAsteroids, smallAsteroid)
 						}
-						spawnedAsteroids = append(spawnedAsteroids, smallAsteroid)
+					} else {
+						z.NewCargoAsteroid(asteroid)
+						z.NewCargoAsteroid(asteroid)
 					}
-				} else {
-					z.NewCargoAsteroid(asteroid)
-					z.NewCargoAsteroid(asteroid)
-				}
 
-				pl.Projectiles = append(pl.Projectiles[:i], pl.Projectiles[i+1:]...)
-				break
+					// Remove projectile that hit
+					pl.Projectiles = append(pl.Projectiles[:i], pl.Projectiles[i+1:]...)
+					break
+				}
 			}
 		}
 

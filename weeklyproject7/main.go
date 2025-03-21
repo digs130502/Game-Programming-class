@@ -55,7 +55,7 @@ func main() {
 			player.CheckPlanetCollision(&planet, heal)
 			zone.UpdateAsteroids()
 			zone.UpdateCargoAsteroids()
-			zone.CheckAsteroidCollision(&player, explosion)
+			zone.CheckAsteroidCollision(&player, &planet, explosion)
 			zone.CheckCargoAsteroidCollision(&player, bounce)
 			gameRunning = planet.CheckGameOver()
 
