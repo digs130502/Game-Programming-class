@@ -1,0 +1,20 @@
+{
+  "Player": {
+    "Pos": {
+      "X": 100,
+      "Y": 100.092094
+    },
+    "Vel": {
+      "X": 0,
+      "Y": -123.5576
+    },
+    "Gravity": {
+      "X": 0,
+      "Y": 500
+    }
+  },
+  "PipeX": 734.79,
+  "PipeHeight": 295,
+  "GotPoint": false,
+  "Points": 4
+}
