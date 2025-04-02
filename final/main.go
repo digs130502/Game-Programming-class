@@ -10,22 +10,35 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
-	// Initialize buttons
 	buttons := NewButtons()
-
-	// Initialize menu
 	mainMenu := true
 
 	for !rl.WindowShouldClose() {
 
-		for mainMenu {
-			rl.BeginDrawing()
+		if mainMenu {
+			buttons.CheckButtons()
 
-			rl.ClearBackground(rl.RayWhite)
+			if buttons.Quit.Quit {
+				break
+			}
+
+			if buttons.Start.Started {
+				mainMenu = false
+			}
+		}
+
+		// --- Rendering ---
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.RayWhite)
+
+		if mainMenu {
 			rl.DrawText("Welcome to my final game!", 270, 150, 20, rl.Black)
 			buttons.DrawButtons()
-
-			rl.EndDrawing()
+		} else {
+			// Game scene here
+			rl.DrawText("Game Started!", 350, 200, 20, rl.DarkGreen)
 		}
+
+		rl.EndDrawing()
 	}
 }

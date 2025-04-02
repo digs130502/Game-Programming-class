@@ -1,6 +1,10 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"fmt"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type Buttons struct {
 	Start StartButton
@@ -15,6 +19,7 @@ type StartButton struct {
 	Text     string
 	TextSize int32
 	Colortheme
+	Started bool
 }
 
 type QuitButton struct {
@@ -25,6 +30,7 @@ type QuitButton struct {
 	Text     string
 	TextSize int32
 	Colortheme
+	Quit bool
 }
 
 type Colortheme struct {
@@ -62,6 +68,7 @@ func NewQuitButton() QuitButton {
 		Text:       "Quit Game",
 		TextSize:   20,
 		Colortheme: cl,
+		Quit:       false,
 	}
 }
 
@@ -69,6 +76,20 @@ func NewButtons() Buttons {
 	return Buttons{
 		Start: NewStartButton(),
 		Quit:  NewQuitButton(),
+	}
+}
+
+func (b *Buttons) CheckButtons() {
+	start := rl.NewRectangle(b.Start.X, b.Start.Y, b.Start.Width, b.Start.Height)
+	quit := rl.NewRectangle(b.Quit.X, b.Quit.Y, b.Quit.Width, b.Quit.Height)
+
+	mousePos := rl.GetMousePosition()
+
+	if rl.CheckCollisionPointRec(mousePos, start) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		fmt.Println("Start Game pressed")
+	}
+	if rl.CheckCollisionPointRec(mousePos, quit) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		b.Quit.Quit = true
 	}
 }
 
