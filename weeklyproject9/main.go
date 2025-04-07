@@ -13,6 +13,12 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 
+		//Updates
+		UpdatePlayers(&pl1, &pl2)
+		CheckPlayerCollisions(&pl1, &pl2)
+		CheckMovement(&pl1, &pl2)
+
+		//Rendering
 		rl.BeginDrawing()
 
 		rl.ClearBackground(rl.Black)
