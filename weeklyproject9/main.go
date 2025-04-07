@@ -8,9 +8,17 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
+	pl1 := NewPlayer1()
+	pl2 := NewPlayer2()
+
 	for !rl.WindowShouldClose() {
+
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.RayWhite)
+
+		rl.ClearBackground(rl.Black)
+		rl.DrawRectangle(0, 350, 800, 100, rl.Orange)
+		DrawPlayers(&pl1, &pl2)
+
 		rl.EndDrawing()
 	}
 }
