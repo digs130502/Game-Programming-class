@@ -7,83 +7,100 @@ import (
 )
 
 type Player1 struct {
-	Texture      rl.Texture2D
-	Pos          rl.Vector2
-	Vel          rl.Vector2
-	Gravity      float32
-	Scale        float32
-	Rotation     float32
-	FrameRec     rl.Rectangle
-	CurrentFrame int
-	IsOnGround   bool
-	Attacking    bool
-	Blocking     bool
-	Health       int32
+	Texture       rl.Texture2D
+	Pos           rl.Vector2
+	Vel           rl.Vector2
+	Gravity       float32
+	Scale         float32
+	Rotation      float32
+	FrameRec      rl.Rectangle
+	CurrentFrame  int
+	IsOnGround    bool
+	Attacking     bool
+	Blocking      bool
+	Health        int32
+	IsFacingRight bool
+	AnimationFSM
 }
 
 type Player2 struct {
-	Texture      rl.Texture2D
-	Pos          rl.Vector2
-	Vel          rl.Vector2
-	Gravity      float32
-	Scale        float32
-	Rotation     float32
-	FrameRec     rl.Rectangle
-	CurrentFrame int
-	IsOnGround   bool
-	Attacking    bool
-	Blocking     bool
-	Health       int32
+	Texture       rl.Texture2D
+	Pos           rl.Vector2
+	Vel           rl.Vector2
+	Gravity       float32
+	Scale         float32
+	Rotation      float32
+	FrameRec      rl.Rectangle
+	CurrentFrame  int
+	IsOnGround    bool
+	Attacking     bool
+	Blocking      bool
+	Health        int32
+	IsFacingRight bool
+	AnimationFSM
 }
 
 func NewPlayer1() Player1 {
 	playerSpr := rl.LoadTexture("assets/sprites/player.png")
 	return Player1{
-		Texture:   playerSpr,
-		Pos:       rl.NewVector2(50, 290),
-		Vel:       rl.NewVector2(0, 0),
-		Gravity:   70,
-		Scale:     3,
-		Rotation:  0,
-		FrameRec:  rl.NewRectangle(0, 0, float32(playerSpr.Width), float32(playerSpr.Height)),
-		Health:    10,
-		Blocking:  false,
-		Attacking: false,
+		Texture:       playerSpr,
+		Pos:           rl.NewVector2(50, 290),
+		Vel:           rl.NewVector2(0, 0),
+		Gravity:       70,
+		Scale:         3,
+		Rotation:      0,
+		FrameRec:      rl.NewRectangle(0, 0, float32(playerSpr.Width), float32(playerSpr.Height)),
+		Health:        10,
+		Blocking:      false,
+		Attacking:     false,
+		IsFacingRight: true,
 	}
 }
 
 func NewPlayer2() Player2 {
-	playerSpr := rl.LoadTexture("assets/sprites/player2.png")
+	playerSpr := rl.LoadTexture("assets/sprites/player.png")
 	return Player2{
-		Texture:   playerSpr,
-		Pos:       rl.NewVector2(750, 290),
-		Vel:       rl.NewVector2(0, 0),
-		Gravity:   70,
-		Scale:     3,
-		Rotation:  0,
-		FrameRec:  rl.NewRectangle(0, 0, float32(playerSpr.Width), float32(playerSpr.Height)),
-		Health:    10,
-		Blocking:  false,
-		Attacking: false,
+		Texture:       playerSpr,
+		Pos:           rl.NewVector2(750, 290),
+		Vel:           rl.NewVector2(0, 0),
+		Gravity:       70,
+		Scale:         3,
+		Rotation:      0,
+		FrameRec:      rl.NewRectangle(0, 0, float32(playerSpr.Width), float32(playerSpr.Height)),
+		Health:        10,
+		Blocking:      false,
+		Attacking:     false,
+		IsFacingRight: false,
 	}
 }
 
 func DrawPlayers(pl1 *Player1, pl2 *Player2) {
+	// Player 1
+	frame1 := pl1.FrameRec
+	if !pl1.IsFacingRight {
+		frame1.Width *= -1
+	}
 	rl.DrawTexturePro(
 		pl1.Texture,
-		pl1.FrameRec,
-		rl.NewRectangle(pl1.Pos.X, pl1.Pos.Y, pl1.FrameRec.Width*pl1.Scale, pl1.FrameRec.Height*pl1.Scale),
+		frame1,
+		rl.NewRectangle(pl1.Pos.X, pl1.Pos.Y, frame1.Width*pl1.Scale, frame1.Height*pl1.Scale),
 		rl.Vector2Scale(rl.NewVector2(float32(pl1.Texture.Width)/2, float32(pl1.Texture.Height)/2), pl1.Scale),
 		pl1.Rotation,
 		rl.White,
 	)
+
+	// Player 2
+	frame2 := pl2.FrameRec
+	if !pl2.IsFacingRight {
+		frame2.Width *= -1
+	}
 	rl.DrawTexturePro(
 		pl2.Texture,
-		pl2.FrameRec,
-		rl.NewRectangle(pl2.Pos.X, pl2.Pos.Y, pl2.FrameRec.Width*pl2.Scale, pl2.FrameRec.Height*pl2.Scale),
+		frame2,
+		rl.NewRectangle(pl2.Pos.X, pl2.Pos.Y, frame2.Width*pl2.Scale, frame2.Height*pl2.Scale),
 		rl.Vector2Scale(rl.NewVector2(float32(pl2.Texture.Width)/2, float32(pl2.Texture.Height)/2), pl2.Scale),
 		pl2.Rotation,
-		rl.White,
+		rl.Red,
 	)
 }
 
@@ -125,28 +142,39 @@ func CheckPlayerFloorCollisions(pl1 *Player1, pl2 *Player2) {
 
 func CheckDamage(pl1 *Player1, pl2 *Player2, h1 *HealthBar1, h2 *HealthBar2) {
 	const attackRange = 100.0
-	// fmt.Println("Distance:", rl.Vector2Distance(pl1.Pos, pl2.Pos))
 
 	// Player 1 attacking Player 2
-	if pl1.Attacking && rl.Vector2Distance(pl1.Pos, pl2.Pos) <= attackRange {
-		if !pl2.Blocking {
-			pl2.Health -= 1
-			h2.Pos.X += 20
-			h2.Width -= 20
-			fmt.Println("Player 2 Health:", pl2.Health)
-		} else {
-			fmt.Println("Player 2 blocked the attack!")
+	if pl1.Attacking {
+		direction := float32(1)
+		if !pl1.IsFacingRight {
+			direction = -1
+		}
+		if (pl2.Pos.X-pl1.Pos.X)*direction > 0 && rl.Vector2Distance(pl1.Pos, pl2.Pos) <= attackRange {
+			if !pl2.Blocking {
+				pl2.Health -= 1
+				h2.Pos.X += 20
+				h2.Width -= 20
+				fmt.Println("Player 2 Health:", pl2.Health)
+			} else {
+				fmt.Println("Player 2 blocked the attack!")
+			}
 		}
 	}
 
 	// Player 2 attacking Player 1
-	if pl2.Attacking && rl.Vector2Distance(pl1.Pos, pl2.Pos) <= attackRange {
-		if !pl1.Blocking {
-			pl1.Health -= 1
-			h1.Width -= 20
-			fmt.Println("Player 1 Health:", pl1.Health)
-		} else {
-			fmt.Println("Player 1 blocked the attack!")
+	if pl2.Attacking {
+		direction := float32(1)
+		if !pl2.IsFacingRight {
+			direction = -1
+		}
+		if (pl1.Pos.X-pl2.Pos.X)*direction > 0 && rl.Vector2Distance(pl1.Pos, pl2.Pos) <= attackRange {
+			if !pl1.Blocking {
+				pl1.Health -= 1
+				h1.Width -= 20
+				fmt.Println("Player 1 Health:", pl1.Health)
+			} else {
+				fmt.Println("Player 1 blocked the attack!")
+			}
 		}
 	}
 }
@@ -156,9 +184,12 @@ func CheckMovement(pl1 *Player1, pl2 *Player2) {
 	// Player 1 Movement
 	if rl.IsKeyDown(rl.KeyD) {
 		pl1.Pos.X += 300 * rl.GetFrameTime()
+		pl1.IsFacingRight = true
 	}
 	if rl.IsKeyDown(rl.KeyA) {
 		pl1.Pos.X -= 300 * rl.GetFrameTime()
+		pl1.IsFacingRight = false
+
 	}
 	if rl.IsKeyPressed(rl.KeyW) && pl1.IsOnGround {
 		pl1.Vel.Y = -25
@@ -177,9 +208,11 @@ func CheckMovement(pl1 *Player1, pl2 *Player2) {
 	// Player 2 Movement
 	if rl.IsKeyDown(rl.KeyRight) {
 		pl2.Pos.X += 300 * rl.GetFrameTime()
+		pl2.IsFacingRight = true
 	}
 	if rl.IsKeyDown(rl.KeyLeft) {
 		pl2.Pos.X -= 300 * rl.GetFrameTime()
+		pl2.IsFacingRight = false
 	}
 	if rl.IsKeyPressed(rl.KeyUp) && pl2.IsOnGround {
 		pl2.Vel.Y = -25

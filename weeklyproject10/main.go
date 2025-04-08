@@ -17,6 +17,23 @@ func main() {
 	h1 := NewHealthBar1(&pl1)
 	h2 := NewHealthBar2(&pl2)
 
+	//Animations
+	idleAnimation := NewAnimation("idle", rl.LoadTexture("assets/sprites/p1idle.png"), 3, .5)
+	walkAnimation := NewAnimation("walk", rl.LoadTexture("assets/sprites/p1walking.png"), 3, .075)
+	jumpAnimation := NewAnimation("jump", rl.LoadTexture("assets/sprites/p1jumping.png"), 5, 0.75)
+	jumpAnimation.Loop = false
+	attackAnimation := NewAnimation("attack", rl.LoadTexture("assets/sprites/p1hitting.png"), 4, .2)
+	blockAnimation := NewAnimation("block", rl.LoadTexture("assets/sprites/p1blocking.png"), 3, .2)
+	blockAnimation.Loop = false
+
+	animationFSM := NewAnimationFSM()
+	animationFSM.AddAnimation(walkAnimation)
+	animationFSM.AddAnimation(idleAnimation)
+	animationFSM.AddAnimation(jumpAnimation)
+	animationFSM.AddAnimation(attackAnimation)
+	animationFSM.AddAnimation(blockAnimation)
+	animationFSM.ChangeAnimationState("idle")
+
 	for !rl.WindowShouldClose() {
 
 		if !isGameOver {
