@@ -80,7 +80,19 @@ func (a *Animation) Reset() {
 }
 
 func (a Animation) DrawAnimation(pos rl.Vector2, size float32, direction float32) {
-	sourceRect := rl.NewRectangle(float32(16*a.CurrentIndex), 0, 16*direction, 16)
+	sourceRect := rl.NewRectangle(float32(32*a.CurrentIndex), 0, 32*direction, 32)
 	destRect := rl.NewRectangle(pos.X, pos.Y, size, size)
 	rl.DrawTexturePro(a.SpriteSheet, sourceRect, destRect, rl.Vector2Zero(), 0, rl.White)
+}
+
+func (p *Player) Jump() {
+	p.Vel.Y = -25
+	p.IsGrounded = false
+}
+
+func (p *Player) Move(x float32) {
+	if x != 0 {
+		p.Direction = x
+	}
+	p.Vel.X = x * p.Speed
 }

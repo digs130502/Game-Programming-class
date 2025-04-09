@@ -3,7 +3,7 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type HealthBar1 struct {
-	Player *Player1
+	Player *Player
 	Width  float32
 	Height float32
 	Pos    rl.Vector2
@@ -11,14 +11,14 @@ type HealthBar1 struct {
 }
 
 type HealthBar2 struct {
-	Player *Player2
+	Player *Player
 	Width  float32
 	Height float32
 	Pos    rl.Vector2
 	Color  rl.Color
 }
 
-func NewHealthBar1(pl1 *Player1) HealthBar1 {
+func NewHealthBar1(pl1 *Player) HealthBar1 {
 	return HealthBar1{
 		Player: pl1,
 		Width:  20 * float32(pl1.Health),
@@ -28,7 +28,7 @@ func NewHealthBar1(pl1 *Player1) HealthBar1 {
 	}
 }
 
-func NewHealthBar2(pl2 *Player2) HealthBar2 {
+func NewHealthBar2(pl2 *Player) HealthBar2 {
 	return HealthBar2{
 		Player: pl2,
 		Width:  20 * float32(pl2.Health),
