@@ -69,9 +69,9 @@ func (a *AnimationFSM) ChangeAnimationState(newAnim string) {
 	a.CurrentAnim.Reset()
 }
 
-func (a *AnimationFSM) DrawWithFSM(pos rl.Vector2, size float32, direction float32) {
+func (a *AnimationFSM) DrawWithFSM(pos rl.Vector2, size float32, direction float32, color rl.Color) {
 	a.CurrentAnim.UpdateTime()
-	a.CurrentAnim.DrawAnimation(pos, size, direction)
+	a.CurrentAnim.DrawAnimation(pos, size, direction, color)
 }
 
 func (a *Animation) Reset() {
@@ -79,10 +79,10 @@ func (a *Animation) Reset() {
 	a.CurrentIndex = 0
 }
 
-func (a Animation) DrawAnimation(pos rl.Vector2, size float32, direction float32) {
+func (a Animation) DrawAnimation(pos rl.Vector2, size float32, direction float32, color rl.Color) {
 	sourceRect := rl.NewRectangle(float32(32*a.CurrentIndex), 0, 32*direction, 32)
 	destRect := rl.NewRectangle(pos.X, pos.Y, size, size)
-	rl.DrawTexturePro(a.SpriteSheet, sourceRect, destRect, rl.Vector2Zero(), 0, rl.White)
+	rl.DrawTexturePro(a.SpriteSheet, sourceRect, destRect, rl.Vector2Zero(), 0, color)
 }
 
 func (p *Player) Jump() {
