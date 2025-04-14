@@ -3,6 +3,7 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 // I want to make a typing game. So you will have to type to go from the bottom to top in platforms
+//TODO: Make a pause game feature where player presses "ESC" and a pause screen is made
 
 func main() {
 	rl.InitWindow(800, 450, "Final Game")
@@ -12,33 +13,39 @@ func main() {
 
 	buttons := NewButtons()
 	mainMenu := true
+	player := NewPlayer()
 
 	for !rl.WindowShouldClose() {
 
 		if mainMenu {
+			// Updates
 			buttons.CheckButtons()
 
-			if buttons.Quit.Quit {
+			//Check if buttons are clicked
+			if buttons.Quit.Clicked {
 				break
 			}
 
-			if buttons.Start.Started {
+			if buttons.Start.Clicked {
 				mainMenu = false
 			}
-		}
 
-		// --- Rendering ---
-		rl.BeginDrawing()
-		rl.ClearBackground(rl.RayWhite)
+			// Rendering
+			rl.BeginDrawing()
 
-		if mainMenu {
+			rl.ClearBackground(rl.RayWhite)
 			rl.DrawText("Welcome to my final game!", 270, 150, 20, rl.Black)
 			buttons.DrawButtons()
+
+			rl.EndDrawing()
 		} else {
 			// Game scene here
-			rl.DrawText("Game Started!", 350, 200, 20, rl.DarkGreen)
-		}
+			rl.BeginDrawing()
 
-		rl.EndDrawing()
+			rl.ClearBackground(rl.RayWhite)
+			player.DrawPlayer()
+
+			rl.EndDrawing()
+		}
 	}
 }

@@ -1,17 +1,16 @@
 package main
 
 import (
-	"fmt"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Buttons struct {
-	Start StartButton
-	Quit  QuitButton
+	Start  Button
+	Quit   Button
+	Resume Button
 }
 
-type StartButton struct {
+type Button struct {
 	X        float32
 	Y        float32
 	Width    float32
@@ -19,18 +18,7 @@ type StartButton struct {
 	Text     string
 	TextSize int32
 	Colortheme
-	Started bool
-}
-
-type QuitButton struct {
-	X        float32
-	Y        float32
-	Width    float32
-	Height   float32
-	Text     string
-	TextSize int32
-	Colortheme
-	Quit bool
+	Clicked bool
 }
 
 type Colortheme struct {
@@ -45,9 +33,9 @@ func NewColorTheme() Colortheme {
 	}
 }
 
-func NewStartButton() StartButton {
+func NewStartButton() Button {
 	cl := NewColorTheme()
-	return StartButton{
+	return Button{
 		X:          350,
 		Y:          200,
 		Width:      100,
@@ -55,12 +43,13 @@ func NewStartButton() StartButton {
 		Text:       "Start Game",
 		TextSize:   20,
 		Colortheme: cl,
+		Clicked:    false,
 	}
 }
 
-func NewQuitButton() QuitButton {
+func NewQuitButton() Button {
 	cl := NewColorTheme()
-	return QuitButton{
+	return Button{
 		X:          350,
 		Y:          275,
 		Width:      100,
@@ -68,14 +57,29 @@ func NewQuitButton() QuitButton {
 		Text:       "Quit Game",
 		TextSize:   20,
 		Colortheme: cl,
-		Quit:       false,
+		Clicked:    false,
+	}
+}
+
+func NewResumeButton() Button {
+	cl := NewColorTheme()
+	return Button{
+		X:          350,
+		Y:          200,
+		Width:      100,
+		Height:     50,
+		Text:       "Resume Game",
+		TextSize:   20,
+		Colortheme: cl,
+		Clicked:    false,
 	}
 }
 
 func NewButtons() Buttons {
 	return Buttons{
-		Start: NewStartButton(),
-		Quit:  NewQuitButton(),
+		Start:  NewStartButton(),
+		Quit:   NewQuitButton(),
+		Resume: NewResumeButton(),
 	}
 }
 
@@ -86,14 +90,37 @@ func (b *Buttons) CheckButtons() {
 	mousePos := rl.GetMousePosition()
 
 	if rl.CheckCollisionPointRec(mousePos, start) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		fmt.Println("Start Game pressed")
+		b.Start.Clicked = true
 	}
 	if rl.CheckCollisionPointRec(mousePos, quit) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		b.Quit.Quit = true
+		b.Quit.Clicked = true
+	}
+}
+
+func (b *Buttons) CheckResumeButtons() {
+	resume := rl.NewRectangle(b.Resume.X, b.Resume.Y, b.Resume.Width, b.Resume.Height)
+	menu := rl.NewRectangle(b.Start.X, b.Start.Y, b.Start.Width, b.Start.Height)
+	quit := rl.NewRectangle(b.Quit.X, b.Quit.Y, b.Quit.Width, b.Quit.Height)
+
+	mousePos := rl.GetMousePosition()
+
+	if rl.CheckCollisionPointRec(mousePos, menu) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		b.Start.Clicked = true
+	}
+	if rl.CheckCollisionPointRec(mousePos, quit) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		b.Quit.Clicked = true
+	}
+	if rl.CheckCollisionPointRec(mousePos, resume) && rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		b.Resume.Clicked = true
 	}
 }
 
 func (b *Buttons) DrawButtons() {
 	rl.DrawRectangle(int32(b.Start.X), int32(b.Start.Y), int32(b.Start.Width), int32(b.Start.Height), b.Start.MainColor)
 	rl.DrawRectangle(int32(b.Quit.X), int32(b.Quit.Y), int32(b.Quit.Width), int32(b.Quit.Height), b.Quit.MainColor)
+}
+
+// FIXME:
+func (b *Buttons) DrawResumeButtons() {
+	rl.DrawRectangle()
 }
