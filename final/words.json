@@ -1,0 +1,48 @@
+{
+    "1": {
+      "description": "Easy words",
+      "words": [
+        "cat",
+        "dog",
+        "sun",
+        "ball",
+        "book",
+        "hat",
+        "car",
+        "tree",
+        "fish",
+        "cup"
+      ]
+    },
+    "2": {
+      "description": "Medium words",
+      "words": [
+        "planet",
+        "window",
+        "basket",
+        "button",
+        "guitar",
+        "laptop",
+        "yellow",
+        "winter",
+        "purple",
+        "rocket"
+      ]
+    },
+    "3": {
+      "description": "Hard words",
+      "words": [
+        "syndrome",
+        "algorithm",
+        "nebulous",
+        "quarantine",
+        "xylophone",
+        "dichotomy",
+        "conundrum",
+        "juxtapose",
+        "aesthetic",
+        "metaphor"
+      ]
+    }
+  }
+  

@@ -22,6 +22,7 @@ func (p *Player) DrawPlayer() {
 	rl.DrawRectangle(int32(p.Pos.X), int32(p.Pos.Y), int32(p.Width), int32(p.Height), p.Color)
 }
 
+// FIXME:
 func CheckInput(b *Buttons) {
 	if rl.IsKeyPressed(rl.KeyEscape) {
 		b.DrawPauseButtons()
