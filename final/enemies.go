@@ -9,7 +9,7 @@ import (
 
 type Zone struct {
 	Enemies []Enemy
-	Timer   float32 // persist timer across frames
+	Timer   float32
 }
 
 type Enemy struct {
@@ -41,7 +41,7 @@ func (z *Zone) CheckEnemyCreation(n float32) {
 	if z.Timer > n {
 		z.Enemies = append(z.Enemies, NewEnemy())
 		fmt.Println("Enemy Created!")
-		z.Timer = 0 // reset after creation
+		z.Timer = 0
 	}
 }
 
