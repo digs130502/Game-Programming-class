@@ -7,6 +7,8 @@ type Player struct {
 	Width  float32
 	Height float32
 	Color  rl.Color
+	Health int
+	Input  string
 }
 
 func NewPlayer() Player {
@@ -15,6 +17,8 @@ func NewPlayer() Player {
 		Width:  30,
 		Height: 30,
 		Color:  rl.Red,
+		Health: 10,
+		Input:  "",
 	}
 }
 

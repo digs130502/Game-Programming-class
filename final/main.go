@@ -1,11 +1,28 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
+
+//Enemy creation: DONE
+//Enemy deletion: DONE (May need to alter detection after adding sprites and animations but to be done LATER)
+//Healthbar: DONE
+//Player character: DONE
+//TODO:
+//		Sprites and animations
+//		Keyboard typing mechanism
+//		Game over screen
+//		Different difficulties (Might be able to implement it in the same level. No need for overcomplications with different levels.)
+//		Customization. (Text. Color. Sprites and Animations)
+//		It's waves based so every level they get a bit faster and more and more. In level 3 they just get infinitely faster
+
+//CURRENTLY DOING:
+//		Keyboard typing mechanism
+// 		Word assignment: DONE
 
 func main() {
 	rl.InitWindow(800, 450, "Final Game")
@@ -21,6 +38,11 @@ func main() {
 	paused := false
 	zone := NewZone()
 	player := NewPlayer()
+	health := NewHealthBar(&player)
+	wordBank, err := LoadWordBank("words.json")
+	if err != nil {
+		log.Fatalf("Failed to load word bank: %v", err)
+	}
 
 	for !rl.WindowShouldClose() {
 
@@ -67,9 +89,11 @@ func main() {
 
 		} else {
 			// --- Gameplay Logic ---
-			zone.CheckEnemyCreation(3)
-			zone.UpdateEnemies()
+			player.CheckKeyboardInput()
+			zone.CheckEnemyCreation(3, wordBank)
+			zone.UpdateEnemies(&player, &health)
 			zone.DrawEnemies()
+			health.DrawHealthBar()
 			// Pressing ESC will pause the game
 			if rl.IsKeyPressed(rl.KeyEscape) {
 				paused = true
